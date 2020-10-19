@@ -38,7 +38,9 @@
   "dependencies": {
     "mdbootstrap": "^4.19.1",
     "mdbreact": "^4.27.0",
-    "radium": "^0.26.0",
+    "node-sass": "^4.14.1",
+    "radium": "^0.26.1",
+    "react-widgets": "^5.0.0-beta.21",
     "style-it": "^2.1.4"
   }
 }
