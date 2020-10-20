@@ -16,4 +16,8 @@ use Illuminate\Support\Facades\Route;
 //  Route::get('/', function () {
 //      return view('welcome');
 //  });
+
 Route::view('/{path?}', 'app');
+Route::get('/lotto_results','PlayLottoController@index');
+Route::post('/formSubmit','PlayLottoController@store');
+Route::get('/tasks', 'TaskController@exportCsv');

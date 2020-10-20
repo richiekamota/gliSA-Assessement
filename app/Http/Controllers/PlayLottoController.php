@@ -27,7 +27,8 @@ class PlayLottoController extends Controller
         //Get lotto results from the database
         $lottoResults = LottoResults::orderBy('created_at','desc')->paginate(10);
 
-        return LottoResultsCollection($lottoResults);
+        //return LottoResultsCollection($lottoResults);
+        return response()->json($lottoResults);
     }
 
     /**
@@ -41,9 +42,9 @@ class PlayLottoController extends Controller
         $validator = Validator::make($request-> all(),
         [
             mainDrawSet => 'required|integer',
-            mainBallsDrawn => 'required',
-            powerBallSet => 'required',
-            powerballBallsDrawn => 'required',
+            mainBallsDrawn => 'required|integer',
+            powerBallSet => 'required|integer',
+            powerballBallsDrawn => 'required|integer',
         ]);    
         if ($validator->fails()){
 

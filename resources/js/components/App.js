@@ -2,12 +2,11 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import { render } from 'react-dom';
-import DisplayLottoHistory from "./DisplayLottoHistory";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import "bootstrap-css-only/css/bootstrap.min.css";
-import 'react-widgets/dist/css/react-widgets.css';
 import "mdbreact/dist/css/mdb.css";
-import { NumberPicker } from 'react-widgets';
+//import { NumberPicker } from 'react-widgets';
+import NumberPicker from 'react-widgets/lib/NumberPicker'
 import PropTypes from "prop-types";
 import Radium, {Style} from 'radium';
 import { MDBBtn, MDBInput, MDBModal, MDBModalBody, MDBModalHeader, MDBModalFooter, MDBIcon, MDBBadge, MDBContainer, MDBRow, MDBCol, MDBSelect} from "mdbreact";
@@ -25,14 +24,13 @@ class App extends Component {
         super(props);
         this.state = {
 
-           drawResults: [], 
-
-            draw: {         
-              mainDrawSet: 0,
-              mainBallsDrawn: 0,
-              powerBallSet: 0,
+            //drawResults: [], 
+            //draw: {         
+              mainDrawSet: 40,
+              mainBallsDrawn: 5,
+              powerBallSet: 5,
               powerballBallsDrawn: 0
-            }
+           //}
         };
        
     }
@@ -41,18 +39,21 @@ class App extends Component {
         this.fetchResults();
    }
   
-     playLotto = ( mainDrawSet,mainBallsDrawn,powerBallSet,powerballBallsDrawn) => {
+    playLotto (mainDrawSet,mainBallsDrawn,powerBallSet,powerballBallsDrawn) {
        
-        return axios
-            .post('/formData',
+                fetch('/formData',
                 {
-                    mainDrawSet: mainDrawSet,
-                    mainBallsDrawn: mainBallsDrawn,
-                    powerBallSet: powerBallSet,
-                    powerballBallsDrawn: powerballBallsDrawn
+                    // mainDrawSet: this.state.mainDrawSet,
+                    // mainBallsDrawn: this.state.mainBallsDrawn,
+                    // powerBallSet: this.state.powerBallSet,
+                    // powerballBallsDrawn: this.state.powerballBallsDrawn
+                    method: 'post',
+                    body: JSON.stringify(this.state)
                 },
                 {
-                    headers: {'Content-Type': 'application/json'}
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',}
                 })
             .then(res => {
                 console.log(res)
@@ -62,26 +63,48 @@ class App extends Component {
             })
     };
 
-    onSubmit = () => {
-       // event.preventDefault();
-        this.playLotto(this.state.mainDrawSet, this.state.mainBallsDrawn, this.state.powerBallSet, this.powerballBallsDrawn).then(() => {
-         // alert(this.mainBallsDrawn);
-        });
+    submit () {
+        console.log(this.state.mainDrawSet,this.state.mainBallsDrawn,this.state.powerBallSet,this.state.powerballBallsDrawn);
+        console.log(this.state);
+        // this.setState({
+        //     draw: {
+        //         mainDrawSet: this.state.mainDrawSet,
+        //         mainBallsDrawn: this.state.mainBallsDrawn,
+        //         powerBallSet: this.state.powerBallSet,
+        //         powerballBallsDrawn:this.state.powerballBallsDrawn 
+        //     }
+        // })
+        //console.log(this.state.draw);
+
+        this.playLotto(this.state.mainDrawSet,this.state.mainBallsDrawn,this.state.powerBallSet,this.state.powerballBallsDrawn)
         this.setState({
-                mainDrawSet: 0,
-                mainBallsDrawn: 0,
-                powerBallSet: 0,
-                powerballBallsDrawn: 0
-            })
+
+           // draw: {
+              mainDrawSet: 40,
+              mainBallsDrawn: 5,
+              powerBallSet: 5,
+              powerballBallsDrawn: 0
+           // }  
+        })
     };
 
-     fetchResults = () => {
-        fetch.get('/lotto_results')
-        .then(res => res.json())
-        .then(res => this.setState({ drawResults: res.data}))
-        .catch(err => console.log(err));
-    }
+    exportTasks = (_this) => {
+        let _url = $(_this).data('href');
+        window.location.href = _url;
+     }
 
+    fetchResults = () => {
+        return fetch('/lotto_results', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+            })
+            .then((res) => res.json())
+            .then(res => this.setState({ drawResults: res.data}))
+            .catch(err => console.log(err));
+    } 
 
     render() {
     
@@ -96,16 +119,16 @@ class App extends Component {
                                 <div className="form-row align-items-center">
                                     <div data-test="col" className="col">
                                         <div className="md-form form-group form-lg md-bg" style={{position: "relative", marginTop: "1.5rem", marginBottom: "1.5rem"}}>
-                                            <label style={{ position: "relative", marginTop: "1.5rem", marginBottom:"1rem"}} for="mainDrawSet">Number of balls in main draw set</label>
-                                            <NumberPicker min={40} max={49} defaultValue={40} type="number" class="browser-default custom-select" id="mainDrawSet" value={this.state.mainDrawSet} onChange={mainDrawSet => this.setState({ mainDrawSet })} style={{width: "400px", height: "40px"}}/>                            
-                                            <label style={{ position: "relative", marginTop: "1.5rem", marginBottom:"1rem"}} for="mainDrawSet">Please choose a number between 40 and 49</label>
+                                            <label style={{ position: "relative", marginTop: "1.5rem", marginBottom:"1rem"}} htmlFor="mainDrawSet">Number of balls in main draw set</label>
+                                            <NumberPicker min={40} max={49} defaultValue={40} type="number" className="custom-select" id="mainDrawSet" value={this.state.mainDrawSet} onChange={mainDrawSet => this.setState({ mainDrawSet})} style={{width: "400px", height: "40px"}}/>                            
+                                            <label style={{ position: "relative", marginTop: "1.5rem", marginBottom:"1rem"}} htmlFor="mainDrawSet">Please choose a number between 40 and 49</label>
                                         </div>                            
                                     </div>
                                     <div data-test="col" className="col">
                                         <div className="md-form form-group form-lg md-bg">
-                                            <label style={{ position: "relative", marginTop: "1.5rem", marginBottom:"1rem"}} for="mainDraw">Number of balls in main draw</label>
-                                            <NumberPicker min={5} max={7} defaultValue={5} type="number" class="browser-default custom-select" id="mainDraw" value={this.state.mainBallsDrawn} onChange={mainBallsDrawn => this.setState({ mainBallsDrawn })} style={{width: "400px", height: "40px"}}/>
-                                            <label style={{ position: "relative", marginTop: "1.5rem", marginBottom:"1rem"}} for="mainDraw">Please choose a number between 5 and 7</label>      
+                                            <label style={{ position: "relative", marginTop: "1.5rem", marginBottom:"1rem"}} htmlFor="mainDraw">Number of balls in main draw</label>
+                                            <NumberPicker min={5} max={7} defaultValue={5} type="number" className="custom-select" id="mainDraw" value={this.state.mainBallsDrawn} onChange={mainBallsDrawn => this.setState({ mainBallsDrawn })} style={{width: "400px", height: "40px"}}/>
+                                            <label style={{ position: "relative", marginTop: "1.5rem", marginBottom:"1rem"}} htmlFor="mainDraw">Please choose a number between 5 and 7</label>      
                                         </div>                            
                                     </div>       
                                 </div>                       
@@ -114,23 +137,23 @@ class App extends Component {
                                     <div className="form-row align-items-center">
                                         <div data-test="col" className="col">
                                             <div className="md-form form-group form-lg md-bg" style={{position: "relative", marginTop: "1.5rem", marginBottom: "1.5rem"}}>
-                                                <label for="powerBallSet" style={{ position: "relative", marginTop: "0.5rem", marginBottom:"0.5rem"}}>Powerball Set</label>
-                                                <NumberPicker min={5} max={49} defaultValue={5} type="number" class="browser-default custom-select" id="powerBallSet" value={this.state.powerBallSet} onChange={powerBallSet => this.setState({ powerBallSet })} style={{width: "400px", height: "40px"}}/>  
-                                                <label for="powerBallSet" style={{ position: "relative", marginTop: "0.5rem", marginBottom:"0.5rem"}}>Please choose a number between 5 and 49</label>
+                                                <label htmlFor="powerBallSet" style={{ position: "relative", marginTop: "0.5rem", marginBottom:"0.5rem"}}>Powerball Set</label>
+                                                <NumberPicker min={5} max={49} defaultValue={5} type="number" className="custom-select" id="powerBallSet" value={this.state.powerBallSet} onChange={powerBallSet => this.setState({ powerBallSet })} style={{width: "400px", height: "40px"}}/>  
+                                                <label htmlFor="powerBallSet" style={{ position: "relative", marginTop: "0.5rem", marginBottom:"0.5rem"}}>Please choose a number between 5 and 49</label>
                                             </div>                            
                                         </div>
                                         <div data-test="col" className="col">
                                             <div className="md-form form-group form-lg md-bg">
-                                                <label for="powerBall" style={{ position: "relative", marginTop: "0.5rem", marginBottom:"0.5rem"}}>Number of powerball balls</label>
-                                                <NumberPicker min={0} max={3} defaultValue={0} type="number" class="browser-default custom-select" value={this.state.powerballBallsDrawn} onChange={powerballBallsDrawn => this.setState({ powerballBallsDrawn })} id="powerBall" style={{width: "400px", height: "40px"}}/>  
-                                                <label for="powerBall" style={{ position: "relative", marginTop: "0.5rem", marginBottom:"0.5rem"}}>Please choose a number between 0 and 3</label>     
+                                                <label htmlFor="powerBall" style={{ position: "relative", marginTop: "0.5rem", marginBottom:"0.5rem"}}>Number of powerball balls</label>
+                                                <NumberPicker min={0} max={3} defaultValue={0} type="number" className="custom-select" value={this.state.powerballBallsDrawn} onChange={powerballBallsDrawn => this.setState({ powerballBallsDrawn})} id="powerBall" style={{width: "400px", height: "40px"}}/>  
+                                                <label htmlFor="powerBall" style={{ position: "relative", marginTop: "0.5rem", marginBottom:"0.5rem"}}>Please choose a number between 0 and 3</label>     
                                             </div>                            
                                         </div>                              
                                     </div>                       
                                 </div>
                                 <div className="mx-3 grey-text row" style={{ position: "relative", marginTop: "1.5rem", marginBottom:"1.5rem"}} data-test="row">                          
                                     <div data-test="row" className="row">
-                                        <button data-test="button" type="button" className="btn-info btn Ripple-parent" style={{width: "400px", height: "40px"}} >Let's Play!<div data-test="waves" className="Ripple "></div></button>
+                                        <button data-test="button" type="button" className="btn-info btn Ripple-parent" style={{width: "400px", height: "40px"}} onClick={()=>{this.submit()}}>Let's Play!<div data-test="waves" className="Ripple "></div></button>
                                     </div>  
                                 </div>                                     
                             </form>                        
@@ -147,45 +170,41 @@ class App extends Component {
                                             </div>                            
                                         </div>
                                         <div data-test="col" className="col">
-                                            <div className="md-form form-group form-lg md-bg">
-                                              <button data-test="button" type="button" className="btn-info btn Ripple-parent" style={{width: "400px", height: "40px"}}>Export To CSV<div data-test="waves" className="Ripple "></div></button>
+                                            <div className="md-form form-group form-lg md-bg">                        
+                                              <button data-href="/tasks" data-test="button" type="button" className="btn-info btn Ripple-parent" style={{width: "400px", height: "40px"}} onClick={()=>{this.exportTasks(event.target)}}>Export To CSV<div data-test="waves" className="Ripple "></div></button>
                                             </div>                           
                                         </div>                              
                                     </div>   
                                 </div>                                 
                     </MDBCol>                               
                 </MDBRow>
+
                 <MDBRow>
                     
-                <MDBCol md="12" className="mb-r">
-                    this.state.drawResults.map((result, index) => ( 
-                      <div className="mx-3 grey-text row" style={{ position: "relative", marginTop: "1.5rem", marginBottom:"1.5rem"}} data-test="row"> 
-                      <table className="table center">
-                          <thead className="grey lighten-2">
-                              <tr>
-                                  <th scope="col">Draw Time</th>
-                                  <th scope="col"> Draw Result</th>
-                                  <th scope="col"> Number of Main Balls Drawn</th>
-                                  <th scope="col">Number of Powerball Balls Drawn</th>
-                              </tr>
-                          </thead>
-                          <tbody>
-                              <tr>
-                                  <th scope="row">result.draw_date</th>
-                                  <td>result.results</td>
-                                  <td>result.main_draw_balls</td>
-                                  <td>result.main_draw_balls</td>
-                              </tr>
-                              <tr>
-                                  <th scope="row">2020-10-02, 5:00pm</th>
-                                  <td>20,47,32,56,43,89</td>
-                                  <td>7</td>
-                                  <td>5</td>
-                              </tr>
-                          </tbody>
-                      </table>
-                    </div>    
-                     ))}           
+                    <MDBCol md="12" className="mb-r">
+                        this.state.drawResults.map((result, index) => (  
+                        <div className="mx-3 grey-text row" style={{ position: "relative", marginTop: "1.5rem", marginBottom:"1.5rem"}} data-test="row"> 
+                            <table className="table center">
+                                <thead className="grey lighten-2">
+                                    <tr>
+                                        <th scope="col">Draw Time</th>
+                                        <th scope="col"> Draw Result</th>
+                                        <th scope="col"> Number of Main Balls Drawn</th>
+                                        <th scope="col">Number of Powerball Balls Drawn</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                     <th scope="row">result.draw_time</th>
+                                        <td>result.results</td>
+                                        <td>result.main_draw_balls</td>
+                                        <td>result.power_balls</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>    
+                         ))       
+                    </MDBCol>         
                 </MDBRow>
             
             </MDBContainer>            
@@ -193,7 +212,7 @@ class App extends Component {
         );
     }               
 
-
+}
 App = Radium(App);
 
 export default App;
