@@ -9,7 +9,7 @@ import "mdbreact/dist/css/mdb.css";
 import NumberPicker from 'react-widgets/lib/NumberPicker'
 import PropTypes from "prop-types";
 import Radium, {Style} from 'radium';
-import { MDBBtn, MDBInput, MDBModal, MDBModalBody, MDBModalHeader, MDBModalFooter, MDBIcon, MDBBadge, MDBContainer, MDBRow, MDBCol, MDBSelect} from "mdbreact";
+import { MDBBtn, MDBInput, MDBModal, MDBModalBody, MDBModalHeader, MDBModalFooter, MDBIcon, MDBBadge, MDBContainer, MDBRow, MDBCol, MDBSelect, MDBInputNumeric} from "mdbreact";
 import { event } from "jquery";
 import axios from 'axios';
 
@@ -118,11 +118,11 @@ class App extends Component {
                             <form className="mx-3 grey-text row" style={{ position: "relative", marginTop: "1.5rem", marginBottom:"1.5rem"}} data-test="row"> 
                                 <div className="form-row align-items-center">
                                     <div data-test="col" className="col">
-                                        <div className="md-form form-group form-lg md-bg" style={{position: "relative", marginTop: "1.5rem", marginBottom: "1.5rem"}}>
+                                        <div className="md-form form-group form-lg md-bg" style={{position: "relative", marginTop: "1.5rem", marginBottom: "1.5rem"}}> 
                                             <label style={{ position: "relative", marginTop: "1.5rem", marginBottom:"1rem"}} htmlFor="mainDrawSet">Number of balls in main draw set</label>
                                             <NumberPicker min={40} max={49} defaultValue={40} type="number" className="custom-select" id="mainDrawSet" value={this.state.mainDrawSet} onChange={mainDrawSet => this.setState({ mainDrawSet})} style={{width: "400px", height: "40px"}}/>                            
                                             <label style={{ position: "relative", marginTop: "1.5rem", marginBottom:"1rem"}} htmlFor="mainDrawSet">Please choose a number between 40 and 49</label>
-                                        </div>                            
+                                        </div>
                                     </div>
                                     <div data-test="col" className="col">
                                         <div className="md-form form-group form-lg md-bg">
@@ -171,7 +171,7 @@ class App extends Component {
                                         </div>
                                         <div data-test="col" className="col">
                                             <div className="md-form form-group form-lg md-bg">                        
-                                              <button data-href="/tasks" data-test="button" type="button" className="btn-info btn Ripple-parent" style={{width: "400px", height: "40px"}} onClick={()=>{this.exportTasks(event.target)}}>Export To CSV<div data-test="waves" className="Ripple "></div></button>
+                                              <button data-href="/tasks" data-test="button" type="button" className="btn-info btn mr-5 Ripple-parent" style={{width: "400px", height: "40px"}} onClick={()=>{this.exportTasks(event.target)}}>Export To CSV</button>
                                             </div>                           
                                         </div>                              
                                     </div>   

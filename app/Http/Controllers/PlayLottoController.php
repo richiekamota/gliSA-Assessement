@@ -41,10 +41,10 @@ class PlayLottoController extends Controller
     {
         $validator = Validator::make($request-> all(),
         [
-            mainDrawSet => 'required|integer',
-            mainBallsDrawn => 'required|integer',
-            powerBallSet => 'required|integer',
-            powerballBallsDrawn => 'required|integer',
+            'mainDrawSet' => 'required|integer',
+            'mainBallsDrawn' => 'required|integer',
+            'powerBallSet' => 'required|integer',
+            'powerballBallsDrawn' => 'required|integer',
         ]);    
         if ($validator->fails()){
 
