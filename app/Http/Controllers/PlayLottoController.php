@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\LottoResults;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use App\Http\Resources\LottoResultsCollection;
 
 
 class PlayLottoController extends Controller
@@ -16,7 +17,8 @@ class PlayLottoController extends Controller
     public $mainBallsDrawn; 
     public $powerBallSet;
     public $powerballBallsDrawn;  
-
+    public $results = [];
+    public $drawResult = [];
     /**
      * Display a listing of the resource.
      *
@@ -29,6 +31,7 @@ class PlayLottoController extends Controller
 
         //return LottoResultsCollection($lottoResults);
         return response()->json($lottoResults);
+        //Log::info($lottoResults);
     }
 
     /**
@@ -39,25 +42,33 @@ class PlayLottoController extends Controller
      */
     public function store(Request $request)
     {
+      Log::info($request->draw['mainDrawSet']);
+
         $validator = Validator::make($request-> all(),
         [
-            'mainDrawSet' => 'required|integer',
-            'mainBallsDrawn' => 'required|integer',
-            'powerBallSet' => 'required|integer',
-            'powerballBallsDrawn' => 'required|integer',
+          $request->draw['mainDrawSet'] => 'required|integer',
+          $request->draw['mainBallsDrawn'] => 'required|integer',
+          $request->draw['powerBallSet'] => 'required|integer',
+          $request->draw['powerballBallsDrawn'] => 'required|integer',
         ]);    
-        if ($validator->fails()){
 
-            $mainDrawSet = $request->mainDrawSet;
-            $mainBallsDrawn = $request->mainBallsDrawn;
-            $powerBallSet = $request->powerBallSet;
-            $powerballBallsDrawn = $request->powerballBallsDrawn; 
+        Log::info($request->draw['powerBallSet']);
+  
+      // if (!$validator->fails()){
 
-        } else {
+         $this->mainDrawSet = $request->draw['mainDrawSet'];
+         $this->mainBallsDrawn = $request->draw['mainBallsDrawn'];
+         $this->powerBallSet = $request->draw['powerBallSet'];
+         $this->powerballBallsDrawn = $request->draw['powerballBallsDrawn']; 
 
-            return response()->json(["status"=> "failed", "message"=> "validation_error", "errors" => $validator->errors()]);
-        } 
-        
+          Log::info('MainDrawSet:'.$this->mainDrawSet.' MainBallsDrawn: '.$this->mainBallsDrawn. ' PowerBallSet: '.$this->powerBallSet.' PowerballBallsDrawn: '.$this->powerballBallsDrawn);
+
+        //} else {
+
+            // return response()->json(["status"=> "failed", "message"=> "validation_error", "errors" => $validator->errors()]);            
+       // } 
+        $this->playLotto();
+              
     }
 
     /**
@@ -67,24 +78,47 @@ class PlayLottoController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function playLotto(){
+    public function playLotto(){ 
+      
+      $drawResult = [];
+      
+      if ($this->powerballBallsDrawn == 0){
+        $drawResult = $this->draw($this->mainDrawSet,$this->mainBallsDrawn);  
+        $this->drawResult = $drawResult; 
+      }
 
-        $drawResult = [];
+      if ($this->powerballBallsDrawn > 0){
+        $drawResult = $this->draw($this->powerBallSet,$this->powerballBallsDrawn);
+        $this->drawResult = $drawResult; 
+      }         
+      Log::info('PowerballBallsDrawn:'.print_r($this->drawResult,true));
+      
+        // switch ($this->drawResult) {
 
-        if ($mainDrawSet){
-           $drawResult = $this->draw($mainDrawSet,$mainBallsDrawn);
-        }
+        //   case ($this->powerballBallsDrawn == 0):
+        //     $this->drawResult = $this->draw($this->powerBallSet,$this->powerballBallsDrawn);             
+        //   break;
+        //   case ($this->powerballBallsDrawn > 0):
+        //     $drawResult = $this->draw($this->powerBallSet,$this->powerballBallsDrawn);
+        //   break;  
+               
+          //  default:     
+          //  $drawResult = $this->draw($this->mainDrawSet,$this->mainBallsDrawn);     
+
+           
+       // }
+                        
           
-        if ($powerBallSet > 0){
-           $drawResult = array_merge($drawResult,$this->draw($powerBallSet,$powerballBallsDrawn)); 
-        }
-         
+         Log::info('DrawResult:'.print_r($this->drawResult,true));
+
+        $drawResult = implode(',',$this->drawResult);
+
         $drawDateNow = Carbon::now()->toDateTimeString();
 
         $lottoResults = new LottoResults();
-        $lottoResults -> results = $drawResult;
-        $lottoResults -> main_draw_balls = $mainBallsDrawn;
-        $lottoResults -> power_balls = $powerballBallsDrawn;
+        $lottoResults -> results =  $drawResult;
+        $lottoResults -> main_draw_balls = $this->mainBallsDrawn;
+        $lottoResults -> power_balls = $this->powerballBallsDrawn;
         $lottoResults -> draw_date = $drawDateNow;
 
         if ($lottoResults ->save()) {
@@ -99,17 +133,35 @@ class PlayLottoController extends Controller
 
     public function draw($setSize, $drawSize)
     {
-        $ballDrawn = 0;
+        $ballsDrawn = 0;
 
-        $results = [];
+        //$results = [];
 
-        while(count($results) < $drawSize) {
-          $ballsDrawn = floor(rand() * $setSize) + 1;
-          if (!in_array($ballDrawn,$results)) {
-            $results.push($ballDrawn);
-          }
+        while(count($this->results) <= $drawSize-1) {
+            $ballsDrawn = floor(random_int(1,$setSize));
+          //if (in_array($ballsDrawn,$this->results)) {
+            
+            $results = array_push($this->results,$ballsDrawn);
+          
+         // }
         }
-        return $results;    
+        return $this->results;    
     }    
+
+    //  public function draw($min, $max, $drawSize, $setSize) {
+
+    //    $ballsDrawn = 0;
+
+    //    $numbers = range($min, $max);
+    //    shuffle($numbers);
+       
+    //       while(count($this->results) <= $drawSize) {
+    //        $ballsDrawn = array_slice($numbers, 0, $setSize); 
+    //         //if (in_array($ballsDrawn,$this->results)) {              
+    //           $results = array_merge($this->results,$ballsDrawn);            
+    //        // }
+    //       }
+    //       return $this->results;
+    //  }
   
 }

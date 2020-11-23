@@ -16,8 +16,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
-});
 
-// Route::get('/', function () {
-//     return view('views.traintimes');
-// });
+    
+});
+Route::get('/lotto_results','PlayLottoController@index');
+Route::view('/{path?}', 'app');
+
+Route::post('/draw','PlayLottoController@store');
+Route::post('/tasks', 'TaskController@exportCsv');
+
+
+
